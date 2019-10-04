@@ -1,12 +1,14 @@
 #ifndef STACK_H_
 #define STACK_H_
-#include"nodes.hpp"
 
+//Stack class with linked representation
+//has only one field - a pointer to the top of the stack
 template<typename T>
 class Stack{
     private:
-        Node<T> *start;
-        void CopyStack(const Node<T>*);
+        struct Node;
+        Node *start;
+        void copyStack(const Node*);
         void deleteStack();
     public:
         Stack();
@@ -15,77 +17,104 @@ class Stack{
         ~Stack();
         bool empty()const;
         void push(const T&);
-        T pop();
-        T top()const;
+        void pop();
+        const T& top()const;
 };
 
+//the structure of a stack's element
+//each element has a value field and a pointer (to the next element or NULL by default)
 template<typename T>
-void Stack<T>::CopyStack(const Node<T> *ptr){
-        if(ptr != nullptr){
-        CopyStack(ptr->next);
-        push(ptr->value);
+struct Stack<T>::Node{
+    T value;
+    Node *next;
+    Node(const T& value_){
+        value = value_;
+        next = nullptr;
+    }
+};
+
+//recursive copy function
+//goes to the bottom of the stack and recursively adds elements
+template<typename T>
+void Stack<T>::copyStack(const Node *node){
+    if(node == nullptr)return;
+    else{
+        copyStack(node->next);
+        push(node->value);
     }
 }
 
+//delete function
 template<typename T>
 void Stack<T>::deleteStack(){
     while(!empty()){
-        Node<T> *ptr = start;
+        Node *ptr = start;
         start = start->next;
         delete ptr;
     }
 }
 
+//constructor
+//in the beginning every stack is empty
 template<typename T>
 Stack<T>::Stack(){
     start = nullptr;
 }
 
+//copy constructor
 template<typename T>
 Stack<T>::Stack(const Stack<T>& other){
     start = nullptr;
-    CopyStack(other.start);
+    copyStack(other.start);
 }
 
+//assignment operator
 template<typename T>
 Stack<T>& Stack<T>::operator=(const Stack<T>& other){
     if(this != &other){
         deleteStack();
-        CopyStack(other.start);
+        copyStack(other.start);
     }
     return *this;
 }
 
+//destructor
 template<typename T>
 Stack<T>::~Stack(){
     deleteStack();
 }
 
+//a stack is empty if the start pointer is NULL
 template<typename T>
 bool Stack<T>::empty()const{
-    return (start == nullptr);
+    return start == nullptr;
 }
 
+//add function
+//adds an element to the top of the stack
 template<typename T>
 void Stack<T>::push(const T& value){
-    Node<T> *newElement = new Node<T>(value);
+    Node *newElement = new Node(value);
     newElement->next = start;
     start = newElement;
 }
 
+
+//remove function
+//removes the top element of the stack if the stack is not empty
 template<typename T>
-T Stack<T>::pop(){
+void  Stack<T>::pop(){
     if(!empty()){
-        Node<T> *ptr = start;
+        Node *ptr = start;
         start = start->next;
-        T v = ptr->value;
         delete ptr;
-        return v;
     }
 }
 
+//peek function
+//returns the value of the top element
 template<typename T>
-T Stack<T>::top()const{
+const T& Stack<T>::top()const{
     if(!empty()){
         return start->value;
     }
