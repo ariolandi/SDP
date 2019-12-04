@@ -21,7 +21,7 @@ class List{
 
         bool empty()const;
         void push_back(const T);
-        void insert_after(iterator, const T);
+        void insert_after(List<T>::iterator, const T);
         void erase(iterator);
 
         iterator begin()const;
